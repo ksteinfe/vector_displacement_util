@@ -29,5 +29,5 @@ def write_tif16(img, pth):
     
 
     #print(np.min(img[:,:,2]), np.max(img[:,:,2]))
-    cv2.imwrite( pth, np.uint16(img*65535) ) # from https://newbedev.com/python-read-and-write-tiff-16-bit-three-channel-colour-images
+    cv2.imwrite( str(pth), np.uint16(img*65535) ) # from https://newbedev.com/python-read-and-write-tiff-16-bit-three-channel-colour-images
 
