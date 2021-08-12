@@ -10,12 +10,11 @@ def refine_directory(pth_src, pth_dst = None):
     elif not isinstance(pth_dst, pathlib.Path): pth_dst = pathlib.Path(pth_dst)
 
     files = sorted([p.resolve() for p in pth_src.glob("*") if p.suffix in [".tif", ".tiff"]])
-    for f in tqdm(files):
+    pbar = tqdm(files)
+    for f in pbar:
         #if f.parts[-1].endswith("{}.tif".format(suffix)): continue
-        start_time = time.time()
-        print("{}".format(f.name))
+        pbar.set_description( "processing {}".format(f.name) )
         _refine_path(f,pth_dst)
-        #print("processed {} in {}s".format(f.name, (time.time() - start_time)))
 
 
 def _refine_path(pth_src, pth_dst):
