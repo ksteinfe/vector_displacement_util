@@ -12,14 +12,14 @@ def refine_directory(pth_src, pth_dst = None):
     for f in files:
         #if f.parts[-1].endswith("{}.tif".format(suffix)): continue
         start_time = time.time()
-        print("\n----- {}".format(f.name))
+        print("{}".format(f.name))
         _refine_path(f,pth_dst)
-        print("processed {} in {}s".format(f.name, (time.time() - start_time)))
+        #print("processed {} in {}s".format(f.name, (time.time() - start_time)))
 
 
 def _refine_path(pth_src, pth_dst):
     #fname, ext = os.path.splitext(pth_src)
-    print("processing {}".format(pth_src.name))
+    #print("processing {}".format(pth_src.name))
 
     img = read_tif16(pth_src) 
 

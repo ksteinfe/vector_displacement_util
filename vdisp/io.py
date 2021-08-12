@@ -13,13 +13,13 @@ def read_tif16(pth):
     if img.shape[2] == 3:
         img = np.dstack( ( img, np.zeros((img.shape[0], img.shape[1])) ) )
         img[:,:,3] = abs(img[:,:,2]) > 0.0
-        print("added alpha channel to shape {}".format(img.shape))
+        #print("added alpha channel to shape {}".format(img.shape))
     
-    print("read TIF of shape {} from {}".format(img.shape, pth))
+    #print("read TIF of shape {} from {}".format(img.shape, pth))
     return img
 
 def write_tif16(img, pth):
-    print("writing TIF of shape {} to {}".format(img.shape, pth))
+    #print("writing TIF of shape {} to {}".format(img.shape, pth))
     
     
     # convert RGB channels from -1->1 to 0->1
