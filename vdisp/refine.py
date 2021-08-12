@@ -1,6 +1,7 @@
 import time, os, pathlib
 from .io import read_tif16, write_tif16
 from .imgop import apply_cityblock_vignette
+from tqdm import tqdm
 
 # pth_src and pth_dest expect pathlib.Path
 def refine_directory(pth_src, pth_dst = None):
@@ -9,7 +10,7 @@ def refine_directory(pth_src, pth_dst = None):
     elif not isinstance(pth_dst, pathlib.Path): pth_dst = pathlib.Path(pth_dst)
 
     files = sorted([p.resolve() for p in pth_src.glob("*") if p.suffix in [".tif", ".tiff"]])
-    for f in files:
+    for f in tqdm(files):
         #if f.parts[-1].endswith("{}.tif".format(suffix)): continue
         start_time = time.time()
         print("{}".format(f.name))
