@@ -1,6 +1,6 @@
 import time, os, pathlib
 from .io import read_tif16, write_tif16
-from .imgop import apply_cityblock_vignette
+from .imgop import apply_cityblock_vignette, apply_gaussian_vignette
 from tqdm import tqdm
 
 # pth_src and pth_dest expect pathlib.Path
@@ -13,8 +13,11 @@ def refine_directory(pth_src, pth_dst = None):
     pbar = tqdm(files)
     for f in pbar:
         #if f.parts[-1].endswith("{}.tif".format(suffix)): continue
-        pbar.set_description( "processing {}".format(f.name) )
+        #start_time = time.time()
+        pbar.set_description("processing {}".format(f))
+        #print("{}".format(f.name))
         _refine_path(f,pth_dst)
+        #print("processed {} in {}s".format(f.name, (time.time() - start_time)))
 
 
 def _refine_path(pth_src, pth_dst):
@@ -24,6 +27,7 @@ def _refine_path(pth_src, pth_dst):
     img = read_tif16(pth_src) 
 
     apply_cityblock_vignette(img,do_save_mask=False)
+    apply_gaussian_vignette(img,do_save_mask=False)
 
     if pth_src.parents[0] == pth_dst:
         write_tif16(img, pth_src.parents[0] / (pth_src.stem + "_refined.tif") )

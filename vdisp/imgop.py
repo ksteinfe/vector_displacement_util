@@ -139,21 +139,23 @@ def apply_cityblock_vignette(im, mlt=2, pwr=3, do_save_mask=False):
     mask = dist_from_edge(mask).astype(np.float32) / 255.0
     mask = pow( np.clip(mask*mlt,0,1), pwr )
     
-    im[:,:,3] = mask
+    im[:,:,3] = mask #overwrites current alpha with cityblock alpha
 
     #print(mask)
     #print(mask.min(), mask.max())
     if do_save_mask: cv2.imwrite(r'C:\tmp\mask.jpg'.format(), mask*255)
 
 
-def apply_gaussian_vignette(im, sig=200, pwr=0.4, do_save_mask=False):
+def apply_gaussian_vignette(im, sig=100, pwr=0.5, do_save_mask=False):
     gkern = cv2.getGaussianKernel(im.shape[1],sig) * cv2.getGaussianKernel(im.shape[0],sig).T
     gkern -= gkern.min()
     mask = pow(gkern/gkern.max(),pwr)
-    mask = np.minimum(mask,im[:,:,3])
-    for i in range(3): im[:,:,i] = im[:,:,i] * mask
+    mask = np.minimum(mask,im[:,:,3]) # take the minimum of current alpha and gaussian
+    #for i in range(3): im[:,:,i] = im[:,:,i] * mask # scale vectors down? NO!    
+    
     im[:,:,3] = mask
     
     if do_save_mask: cv2.imwrite(r'C:\tmp\mask.jpg'.format(), mask*255)
+    
 
 
