@@ -27,7 +27,7 @@ def _refine_path(pth_src, pth_dst):
     img = read_tif16(pth_src) 
 
     apply_cityblock_vignette(img,do_save_mask=False)
-    apply_gaussian_vignette(img,do_save_mask=False)
+    #apply_gaussian_vignette(img,do_save_mask=False)
 
     if pth_src.parents[0] == pth_dst:
         write_tif16(img, pth_src.parents[0] / (pth_src.stem + "_refined.tif") )

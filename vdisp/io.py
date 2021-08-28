@@ -1,5 +1,6 @@
 import numpy as np
 import cv2
+import copy
 
 def read_tif16(pth):
     img = cv2.imread(str(pth), -1) # open image without changing 16 bit data type
@@ -19,6 +20,7 @@ def read_tif16(pth):
     return img
 
 def write_tif16(img, pth):
+    img = copy.deepcopy(img)
     #print("writing TIF of shape {} to {}".format(img.shape, pth))
     
     

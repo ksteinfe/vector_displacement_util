@@ -1,22 +1,33 @@
 import math
 import numpy as np
 import cv2
+import copy
 
 from scipy.ndimage.morphology import binary_erosion
 from scipy.spatial.distance import cdist
 from scipy import ndimage
 
 
+
+def resize(img,sz):
+    return cv2.resize(img,sz)
+
+
 def flip_x(img):
-    img = np.copy(img)
+    img = copy.deepcopy(img)
     img = np.flip(img, 0)
     img[:,:,0] = img[:,:,0]*-1
     return img
 
 def flip_y(img):
-    img = np.copy(img)
+    img = copy.deepcopy(img)
     img = np.flip(img, 1)
     img[:,:,2] *= -1
+    return img
+
+def flip_z(img):
+    img = copy.deepcopy(img)
+    img[:,:,1] *= -1
     return img
 
 
@@ -24,7 +35,7 @@ def flip_y(img):
 # returns an image of a different shape
 def rotate(img, deg):
     #print("rotating image of shape {}".format(img.shape))
-    img = np.copy(img)
+    img = copy.deepcopy(img)
     theta = np.deg2rad(deg)
     x = img[:,:,2] * np.cos(theta) - img[:,:,0] * np.sin(theta)
     y = img[:,:,2] * np.sin(theta) + img[:,:,0] * np.cos(theta)
@@ -38,7 +49,7 @@ def rotate(img, deg):
 
 
 def rotate_90_cw(img):
-    img = np.copy(img)
+    img = copy.deepcopy(img)
     img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)    
     r,b = img[:,:,2].copy(), img[:,:,0].copy()
 
@@ -47,7 +58,7 @@ def rotate_90_cw(img):
     return img
 
 def rotate_90_ccw(img):
-    img = np.copy(img)
+    img = copy.deepcopy(img)
     img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
     r,b = img[:,:,2].copy(), img[:,:,0].copy()
 
@@ -57,32 +68,24 @@ def rotate_90_ccw(img):
 
 
 # from https://stackoverflow.com/questions/14063070/overlay-a-smaller-image-on-a-larger-image-python-opencv
-def overlay_image_alpha(imbase, imover, x, y):
+def overlay_image_alpha(imbase, imover, x, y, tile_horz=True, tile_vert=True):
     dimbase, dimover = imbase.shape, imover.shape
-    x,y = x%dimbase[1], y%dimbase[0]
+    if tile_horz: x = x%dimbase[1]
+    if tile_vert: y = y%dimbase[0]
     #print("overlay {} on base of {} at {},{}".format(dimover, dimbase, x, y))
     
     if x+dimover[1] > dimbase[1]:
         imover_a = imover[:, 0:dimbase[1]-x] 
         imover_b = imover[:, dimbase[1]-x:]
         overlay_image_alpha(imbase, imover_a, x, y )
-        overlay_image_alpha(imbase, imover_b, 0, y )
+        if tile_horz: overlay_image_alpha(imbase, imover_b, 0, y )
         return
-        '''
-        if x<0:        
-            print("x split 1")
-            imover_a = imover[:, abs(x):dimover[1]] 
-            imover_b = imover[:, 0:abs(x)]
-            overlay_image_alpha(imbase, imover_a, 0, y )
-            overlay_image_alpha(imbase, imover_b, dimbase[1]+x, y )
-            return
-        '''
 
     if y+dimover[0] > dimbase[0]:
         imover_a = imover[0:dimbase[0]-y, :] 
         imover_b = imover[dimbase[0]-y:, :]
         overlay_image_alpha(imbase, imover_a, x, y )
-        overlay_image_alpha(imbase, imover_b, x, 0 )
+        if tile_vert: overlay_image_alpha(imbase, imover_b, x, 0 )
         return
 
     # Image ranges
@@ -95,7 +98,7 @@ def overlay_image_alpha(imbase, imover, x, y):
 
     # Exit if nothing to do
     if y1 >= y2 or x1 >= x2 or y1o >= y2o or x1o >= x2o:
-        print("nothing to do!")
+        #print("nothing to do!")
         return
 
     # Blend overlay within the determined ranges

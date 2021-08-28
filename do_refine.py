@@ -1,6 +1,6 @@
 import vdisp as vd
 
-PTH_SRC = r'C:\tmp'
+PTH_SRC = r'C:\tmp\test'
 
 
 def main():
