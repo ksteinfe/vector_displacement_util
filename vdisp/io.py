@@ -10,11 +10,20 @@ def read_tif16(pth):
     img[:,:,0] = img[:,:,0]*2-1
     img[:,:,1] = img[:,:,1]*2-1
     img[:,:,2] = img[:,:,2]*2-1
-    
+
+    thresh = 0.02 # Z displacments with abslt val less than 2% are cut off by alpha
+    def calc_alpha(disp):
+        if abs(disp) >= thresh: return 1.0 # 100% alpha if displacement is greater than thresh
+        #return (abs(disp)/thresh)**3 # smooth the alpha for disp within thresh
+        return 0.0 # hard cutoff
+
+    vfunc = np.vectorize(calc_alpha)
+
     if img.shape[2] == 3:
         img = np.dstack( ( img, np.zeros((img.shape[0], img.shape[1])) ) )
-        img[:,:,3] = abs(img[:,:,2]) > 0.0
+        img[:,:,3] = vfunc(img[:,:,1]) # Z displacement channel is img[:,:,1] 
         #print("added alpha channel to shape {}".format(img.shape))
+        write_tif16(img,r'C:\tmp\out.tif')
     
     #print("read TIF of shape {} from {}".format(img.shape, pth))
     return img
