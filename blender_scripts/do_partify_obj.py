@@ -6,8 +6,8 @@ from mathutils import Vector #bpy mathutils
 import pathlib, time
 
 PTH_CUTR = pathlib.Path(r'C:\tmp\cutter.blend')
-PTH_SRC = pathlib.Path(r'C:\tmp\210904_hexheads_halfbake-000141-210905-circle-400_0-3\obj_solid')
-PTH_DST = pathlib.Path(r'C:\tmp\210904_hexheads_halfbake-000141-210905-circle-400_0-3\obj_part')
+PTH_SRC = pathlib.Path(r'C:\tmp')
+PTH_DST = pathlib.Path(r'C:\tmp')
 
 MSH_NAME_DIF = "SUBTRACT" # name of object in cutter file to use as a subtraction
 

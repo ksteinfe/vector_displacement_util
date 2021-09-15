@@ -6,7 +6,14 @@ import vdisp as vd
 PTH_SRC = pathlib.Path(r'C:\tmp') 
 PTH_DST = pathlib.Path(r'C:\tmp')
 DO_DEBUG = False
-PLOT_TRANSPARENT_PTS = False
+
+# smoothing and culling config
+PLOT_TRANSPARENT_PTS = True # plot fully transparent points?
+ALPHA_SIG_SMOOTH_K = 500 # displacement is scaled by a sigmoid function of alpha of image. higher values here create sharper falloff of alpha
+ALPHA_SIG_SMOOTH_MID = 0.01 # displacement is scaled by a sigmoid function of alpha of image. this is the midpoint of sigmoid, effecively the 'center point' of the falloff
+
+XYDISP_FULL = False # if True, xy displacements span the whole uv square (-1 to 1); if False, xy displacements span half the uv square (-0.5 to 0.5)
+ZDISP_INOUT = False # both-direction "b" displacements might be positive or negative; out-only "o" displacements are only positive (out)
 
 def main():
     files = sorted([p.resolve() for p in PTH_SRC.glob("*") if p.suffix in [".tif"]])
@@ -24,11 +31,11 @@ def main():
 def process_path(pth_src, pth_dst):
     print("processing {} to {}".format(pth_src,pth_dst))
 
-    img = vd.read_tif16(pth_src) # img[:,:,1] is Z displacement 
+    img = vd.read_tif16(pth_src, XYDISP_FULL, ZDISP_INOUT) # img[:,:,1] is Z displacement 
     
     pgrid = img_to_pointgrid(img) # (512, 512, 5) (x,y,z,a,idx)
 
-    print(pgrid.shape)
+    #print(pgrid.shape)
     
     if DO_DEBUG: writeXYZ(pgrid, pth_src)
     writeOBJ(pgrid, pth_dst)
@@ -37,7 +44,7 @@ def process_path(pth_src, pth_dst):
 # pt is array of [x,y,z,a]
 def point_is_valid(pt):
     if PLOT_TRANSPARENT_PTS: return True
-    return pt[3] > 0.005
+    return pt[3] > 0.0
 
 
 def writeOBJ(pgrid, pth_src):
@@ -85,10 +92,20 @@ def writeXYZ(pgrid, pth_src):
 
 def img_to_pointgrid(img):
     bx,by,bz = base_pointcoords(img.shape)
-    dx = bx + img[:,:,2]*0.5 # X displacement
-    dy = by + img[:,:,0]*0.5 # Y displacement
-    dz = bz + img[:,:,1]*0.5 # Z displacement
     alpha = img[:,:,3]
+
+    def sigmoid(x):
+        k = ALPHA_SIG_SMOOTH_K
+        mid = ALPHA_SIG_SMOOTH_MID
+        return 1 / (1 + np.exp(-k*(x-mid)))
+
+    apow = sigmoid(alpha)
+    apow[:1,:], apow[-1:,:], apow[:,:1], apow[:,-1:] = 0,0,0,0 # set edges to zero displacement
+    
+    dx = bx + img[:,:,2]*0.5*apow # X displacement
+    dy = by + img[:,:,0]*0.5*apow # Y displacement
+    dz = bz + img[:,:,1]*0.5*apow # Z displacement
+    
     idx = np.reshape( np.arange(img.shape[0] * img.shape[1]).astype(np.int32), (img.shape[0],img.shape[1]) )
     pgrid = np.stack((dx,dy,dz,alpha,idx),axis=2)
 

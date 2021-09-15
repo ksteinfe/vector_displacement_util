@@ -6,8 +6,8 @@ from mathutils import Vector #bpy mathutils
 import pathlib, time
 
 PTH_BASE = pathlib.Path(r'C:\tmp\solid_base.blend') 
-PTH_SRC = pathlib.Path(r'C:\tmp\210904_hexheads_halfbake-000141-210905-circle-400_0-3\obj') 
-PTH_DST = pathlib.Path(r'C:\tmp\210904_hexheads_halfbake-000141-210905-circle-400_0-3\obj_solid')
+PTH_SRC = pathlib.Path(r'C:\tmp') 
+PTH_DST = pathlib.Path(r'C:\tmp')
 SUFFIX = "sld"
 
 
