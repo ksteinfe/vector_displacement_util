@@ -1,3 +1,7 @@
+import sys  
+from pathlib import Path
+sys.path.append(str(Path(__file__). resolve().parents[1]))
+
 import vdisp as vd
 import vdisp.imgop as iop
 import numpy as np
@@ -27,8 +31,8 @@ def main():
 
 
 def strip_freize(cfg):
-    seq_a = load_sequence( pathlib.Path(r'C:\tmp\sequence_a') )
-    seq_b = load_sequence( pathlib.Path(r'C:\tmp\sequence_b') )
+    seq_a = vd.load_sequence( pathlib.Path(r'C:\tmp\sequence_a'), CNT_FRAMES )
+    seq_b = vd.load_sequence( pathlib.Path(r'C:\tmp\sequence_b'), CNT_FRAMES )
     pbar = tqdm(range(CNT_FRAMES))
     for idx_frame in pbar:
         pbar.set_description("frame {} of {}".format(idx_frame,CNT_FRAMES))
@@ -44,9 +48,9 @@ def strip_freize(cfg):
         vd.write_tif16(bimg, PTH_DST / "{:03}.tif".format(idx_frame) )
 
 def deep_freize(cfg):
-    seq_a = load_sequence( pathlib.Path(r'G:\My Drive\Research and Professional Service\21 Venice Biennale\Biennale Production\Blender Farm\210812_mirrorwalk\tif_refined') )
-    seq_b = load_sequence( pathlib.Path(r'G:\My Drive\Research and Professional Service\21 Venice Biennale\Biennale Production\Blender Farm\210812_first\tif_b') )
-    seq_c = load_sequence( pathlib.Path(r'C:\tmp\sequence_a') )
+    seq_a = vd.load_sequence( pathlib.Path(r'G:\My Drive\Research and Professional Service\21 Venice Biennale\Biennale Production\Blender Farm\210812_mirrorwalk\tif_refined'),CNT_FRAMES )
+    seq_b = vd.load_sequence( pathlib.Path(r'G:\My Drive\Research and Professional Service\21 Venice Biennale\Biennale Production\Blender Farm\210812_first\tif_b'),CNT_FRAMES )
+    seq_c = vd.load_sequence( pathlib.Path(r'C:\tmp\sequence_a') )
 
     pbar = tqdm(range(CNT_FRAMES))
     for n in pbar:
@@ -121,18 +125,6 @@ def sinlerp_pt(pa,pb,t): return sinlerp(pa[0],pb[0],t), sinlerp(pa[1],pb[1],t)
 def sinlerp(a,b,t): return int( (b-a)*math.sin(t*math.pi)+a )
 
 
-
-
-def load_sequence(pth):
-    print("loading sequence {}".format(pth.stem))
-    files = sorted([p.resolve() for p in pth.glob("*") if p.suffix in [".tif", ".tiff"]])
-    if len(files)==0: raise Exception("No TIFF files found in {}".format(pth))
-
-    ret,n = [],0
-    while len(ret)<CNT_FRAMES:
-        ret.append(vd.read_tif16(files[n%len(files)]))
-        n+=1
-    return ret
 
 def create_base_image(w,h):
     return np.full( (h,w,4), 0.0, np.float32) # size is height, width (y,x)

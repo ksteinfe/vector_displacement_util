@@ -14,7 +14,7 @@ def refine_directory(pth_src, pth_dst = None):
     for f in pbar:
         #if f.parts[-1].endswith("{}.tif".format(suffix)): continue
         #start_time = time.time()
-        pbar.set_description("processing {}".format(f))
+        pbar.set_description("refining {}".format(f))
         #print("{}".format(f.name))
         _refine_path(f,pth_dst)
         #print("processed {} in {}s".format(f.name, (time.time() - start_time)))

@@ -16,18 +16,18 @@ def resize(img,sz):
 def flip_x(img):
     img = copy.deepcopy(img)
     img = np.flip(img, 0)
-    img[:,:,0] = img[:,:,0]*-1
+    img[:,:,0] = img[:,:,0]*-1.0
     return img
 
 def flip_y(img):
     img = copy.deepcopy(img)
     img = np.flip(img, 1)
-    img[:,:,2] *= -1
+    img[:,:,2] *= -1.0
     return img
 
 def flip_z(img):
     img = copy.deepcopy(img)
-    img[:,:,1] *= -1
+    img[:,:,1] *= -1.0
     return img
 
 
@@ -43,7 +43,13 @@ def rotate(img, deg):
     img[:,:,2] = x
     img[:,:,0] = y
     
-    img = ndimage.rotate(img, deg)
+    R = ndimage.rotate(img[:,:,0], deg, mode='constant', cval=0.0) 
+    G = ndimage.rotate(img[:,:,1], deg, mode='constant', cval=0.0)
+    B = ndimage.rotate(img[:,:,2], deg, mode='constant', cval=0.0)
+    A = ndimage.rotate(img[:,:,3], deg, mode='constant', cval=0.0) 
+    img = np.dstack( ( R,G,B,A ) )
+
+    #img = calculate_alpha_from_disp_thresh(img)
     #print("returning image of shape {}".format(img.shape))
     return img
 
@@ -160,5 +166,21 @@ def apply_gaussian_vignette(im, sig=100, pwr=0.5, do_save_mask=False):
     
     if do_save_mask: cv2.imwrite(r'C:\tmp\mask.jpg'.format(), mask*255)
     
+# Z displacments with abslt val less than 2% are cut off by alpha
+def calculate_alpha_from_disp_thresh(img, thresh=0.02):
+    img = copy.deepcopy(img)
+    if img.shape[2] == 4:
+        img = img[:,:,:3]
 
+    def calc_alpha(disp):
+        if abs(disp) >= thresh: return 1.0 # 100% alpha if displacement is greater than thresh
+        #return (abs(disp)/thresh)**3 # smooth the alpha for disp within thresh
+        return 0.0 # hard cutoff
+
+    vfunc = np.vectorize(calc_alpha)
+
+    img = np.dstack( ( img, np.zeros((img.shape[0], img.shape[1])) ) )
+    img[:,:,3] = vfunc(img[:,:,1]) # Z displacement channel is img[:,:,1]     
+    print("added alpha channel to shape {}".format(img.shape))
+    return img
 
