@@ -181,6 +181,6 @@ def calculate_alpha_from_disp_thresh(img, thresh=0.02):
 
     img = np.dstack( ( img, np.zeros((img.shape[0], img.shape[1])) ) )
     img[:,:,3] = vfunc(img[:,:,1]) # Z displacement channel is img[:,:,1]     
-    print("added alpha channel to shape {}".format(img.shape))
+    #print("added alpha channel to shape {}".format(img.shape))
     return img
 
