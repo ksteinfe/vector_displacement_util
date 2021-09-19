@@ -6,7 +6,7 @@ import cv2
 import copy
 from tqdm import tqdm
 
-PTH_SRC = r'C:\tmp\210912_dphheads\tif'
+PTH_SRC = r'C:\tmp\210918_faces'
 
 #ROTS = (['','a','b','c','d'],[0,-60,-30,30,60])
 #ROTS = (['a','b','c','d'],[30,45,60,90])

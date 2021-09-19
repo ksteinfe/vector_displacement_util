@@ -3,14 +3,11 @@ import numpy as np
 import pywavefront as pywv
 
 from scipy import spatial
-from scipy.spatial import KDTree
-from PIL import Image
-import OpenEXR, Imath
 from tqdm import tqdm
 import cv2
 
-PTH_SRC = pathlib.Path(r'C:\tmp\210912_dphheads\obj')
-PTH_DST = pathlib.Path(r'C:\tmp\210912_dphheads\tif')
+PTH_SRC = pathlib.Path(r'C:\tmp')
+PTH_DST = pathlib.Path(r'C:\tmp')
 IMG_SIZE = 512
 DO_ALPHA = True
 DO_DEBUG = False
