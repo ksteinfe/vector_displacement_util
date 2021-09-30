@@ -68,13 +68,13 @@ def write_tif16(img, pth, xydisp_full, zdisp_inout):
 
 # loads a folder full of TIFF images into a sequence of a desired length.
 # if not enough images are present, we loop unil full
-def load_sequence(pth, frame_count):
+def load_sequence(pth, frame_count, xydisp_full, zdisp_inout):
     print("loading sequence {}".format(pth.stem))
     files = sorted([p.resolve() for p in pth.glob("*") if p.suffix in [".tif", ".tiff"]])
     if len(files)==0: raise Exception("No TIFF files found in {}".format(pth))
 
     ret,n = [],0
     while len(ret)<frame_count:
-        ret.append(read_tif16(files[n%len(files)]))
+        ret.append(read_tif16(files[n%len(files)], xydisp_full, zdisp_inout))
         n+=1
     return ret

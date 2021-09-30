@@ -6,31 +6,40 @@ from tqdm import tqdm
 import numpy as np
 import pymeshlab
 
+
+# config for smoothing and culling based on alpha of image
+ALPHA_SIG_SMOOTH_K = 500 # displacement is scaled by a sigmoid function of alpha of image. higher values here create sharper falloff of alpha
+ALPHA_SIG_SMOOTH_MID = 0.01 # displacement is scaled by a sigmoid function of alpha of image. this is the midpoint of sigmoid, effecively the 'center point' of the falloff
+
+
 # pth_src and pth_dest expect pathlib.Path
-def solidify_directory(pth_src, xydisp_full, zdisp_inout, trim_to=False, pth_dst = None):
+def solidify_directory(pth_src, xydisp_full, zdisp_inout, reconstruction_depth=8, trim_to=False, pth_dst = None):
     if not isinstance(pth_src, pathlib.Path): pth_src = pathlib.Path(pth_src)
     if pth_dst is None: pth_dst = pth_src
     elif not isinstance(pth_dst, pathlib.Path): pth_dst = pathlib.Path(pth_dst)
 
     files = sorted([p.resolve() for p in pth_src.glob("*") if p.suffix in [".tif", ".tiff"]])
-    for f in files:
+    for n,f in enumerate(files):
+        #if n%4!=0: continue
         start_time = time.time()
         print("\n\n------------------------------ {}\n-----".format(f.name))
         try:
-            solidify_path(f,pth_dst,xydisp_full, zdisp_inout, "unit_circle.ply")
+            solidify_path(f,pth_dst,xydisp_full, zdisp_inout, reconstruction_depth=reconstruction_depth, trim_to="unit_circle.ply")
             print("----- processed {} in {}s\n------------------------------".format(f.name, (time.time() - start_time)))
         except Exception as e:
             print("!!!!! FAILED {} in {}s\n!!!!!!!!!!!!!!!!!!!!!".format(f.name, (time.time() - start_time)))
             print(traceback.format_exc())
 
+        
 
-def solidify_path(pth_src, pth_dst, xydisp_full, zdisp_inout, trim_to=False):
+
+def solidify_path(pth_src, pth_dst, xydisp_full, zdisp_inout, reconstruction_depth=8, trim_to=False):
     pth_trim = False
     if trim_to:
         pth_msh = pathlib.Path(vdisp.__file__).parent / 'msh' # path to module mesh directory
         files = [p.resolve() for p in pth_msh.glob("*") if p.suffix in [".ply", ".obj"]]
         pth_trim = [p for p in files if p.name == trim_to]
-        if len(trim_to)!=1: raise Exception("Cannot trim to mesh {} because it was not found in the module mesh directory".format(trim_to))
+        if len(pth_trim)!=1: raise Exception("Cannot trim to mesh {} because it was not found in the module mesh directory".format(trim_to))
         pth_trim = str(pth_trim[0])
 
     print("... constructing base mesh.")
@@ -57,7 +66,7 @@ def solidify_path(pth_src, pth_dst, xydisp_full, zdisp_inout, trim_to=False):
             ms.load_new_mesh(tf.name)
             print("... loaded base mesh in Meshlab.")
 
-            ms.surface_reconstruction_screened_poisson(depth=8) # default is 8
+            ms.surface_reconstruction_screened_poisson(depth=reconstruction_depth) # default is 8
             print("... completed ms.surface_reconstruction_screened_poisson(). now there are {} meshes.".format(len(ms)))
             ms.load_new_mesh(pth_trim)
             print("... loaded trimming mesh. now there are {} meshes.".format(len(ms)))
@@ -82,10 +91,6 @@ def solidify_path(pth_src, pth_dst, xydisp_full, zdisp_inout, trim_to=False):
             tf.close()
             os.unlink(tf.name)
 
-
-# smoothing and culling config
-ALPHA_SIG_SMOOTH_K = 500 # displacement is scaled by a sigmoid function of alpha of image. higher values here create sharper falloff of alpha
-ALPHA_SIG_SMOOTH_MID = 0.01 # displacement is scaled by a sigmoid function of alpha of image. this is the midpoint of sigmoid, effecively the 'center point' of the falloff
 
 
 def _pts_to_objstr(pgrid, bgrid):
