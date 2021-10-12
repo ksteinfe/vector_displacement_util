@@ -2,8 +2,8 @@ import pathlib
 import vdisp as vd
 from vdisp.solidify import solidify_directory
 
-PTH_SRC = pathlib.Path(r'C:\tmp\210918_facesoverfit-000020-210930-circle-500-4\tif_refined')
-PTH_DST = pathlib.Path(r'C:\tmp\210918_facesoverfit-000020-210930-circle-500-4')
+PTH_SRC = pathlib.Path(r'G:\My Drive\Research and Professional Service\21 Venice Biennale\Biennale Production\Latent Printable\210918_facesoverfit-000020-210930-circle-500-4\tif_refined_trucated')
+PTH_DST = pathlib.Path(r'G:\My Drive\Research and Professional Service\21 Venice Biennale\Biennale Production\Latent Printable\210918_facesoverfit-000020-210930-circle-500-4')
 
 XYDISP_FULL = False # if True, xy displacements span the whole uv square (-1 to 1); if False, xy displacements span half the uv square (-0.5 to 0.5)
 ZDISP_INOUT = False # both-direction "b" displacements might be positive or negative; out-only "o" displacements are only positive (out)
@@ -13,7 +13,7 @@ ZDISP_INOUT = False # both-direction "b" displacements might be positive or nega
 # 9 is high-res ~90s
 # 10 is too much ~130s 
 # 11 is ridiculous ~210s
-reconstruction_depth = 10
+reconstruction_depth = 9
 
 def main():
     solidify_directory(

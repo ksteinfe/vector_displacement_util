@@ -1,4 +1,4 @@
-import time, os, pathlib
+import time, os, pathlib, math
 from vdisp.imgop import flip_y, flip_z
 import numpy as np
 import pymeshlab
@@ -67,6 +67,15 @@ def do_thicken_and_cut_window(pth_a, pth_b, offset_dist, disjoint_size=False, sa
     ms.load_new_mesh(str(pth_a))
     print("... loaded base mesh in Meshlab.")
 
+    ms.duplicate_current_layer()
+    print("... duplicated layer. Now there are {} meshes".format(len(ms)))
+    #thrsh = np.abs(offset_dist/5)
+    #ms.simplification_clustering_decimation(threshold=thrsh)
+    #print("... simplification_clustering_decimation with a threshold of {}. Now there are {} meshes".format(thrsh, len(ms)))\
+    perc = 0.01
+    ms.simplification_quadric_edge_collapse_decimation(targetperc=perc)
+    print("... simplification_quadric_edge_collapse_decimation with a targetperc of {}. Now there are {} meshes".format(perc, len(ms)))
+
     # I don't understand the 'offset' parameter
     # documentation describes as a percentage (where 50% is on the surface), but this operates in absolute units
     print("... resampling with an offset of {}".format(offset_dist))
@@ -80,6 +89,40 @@ def do_thicken_and_cut_window(pth_a, pth_b, offset_dist, disjoint_size=False, sa
 
     ms.load_new_mesh(str(pth_b))
     print("... loaded other mesh. now there are {} meshes.".format(len(ms)))
+    
+    ms.mesh_boolean_union(first_mesh=2, second_mesh=3)
+    print("... completed boolean union operation. now there are {} meshes.".format(len(ms)))
+    ms.remove_duplicate_vertices()
+    ms.remove_duplicate_faces()
+    ms.merge_close_vertices()
+
+    ms.mesh_boolean_difference(first_mesh=0, second_mesh=4)
+    print("... completed boolean difference operation. now there are {} meshes.".format(len(ms)))
+
+    pth_save = str(save_as) if save_as else str(pth_a)
+    ms.save_current_mesh(pth_save)
+
+def ERASE__do_thicken_and_cut_window(pth_a, pth_b, offset_dist, disjoint_size=False, save_as=False):
+    ms = pymeshlab.MeshSet()
+
+    start_time = time.time()
+    ms.load_new_mesh(str(pth_a))
+    print("... loaded base mesh in Meshlab.")
+
+    # I don't understand the 'offset' parameter
+    # documentation describes as a percentage (where 50% is on the surface), but this operates in absolute units
+    print("... resampling with an offset of {}".format(offset_dist))
+    ms.uniform_mesh_resampling(offset=offset_dist, mergeclosevert=True , multisample =True)
+    print("... completed uniform_mesh_resampling operation in {:.1f}s. now there are {} meshes.".format((time.time() - start_time),len(ms)))
+
+    if not disjoint_size: disjoint_size = np.abs(offset_dist * 10)
+    ms.remove_isolated_pieces_wrt_diameter(mincomponentdiag=disjoint_size)
+    print("... removed isolated pieces with a diameter less than {}".format(disjoint_size))
+
+
+    ms.load_new_mesh(str(pth_b))
+    print("... loaded other mesh. now there are {} meshes.".format(len(ms)))
+    
     ms.mesh_boolean_union(first_mesh=1, second_mesh=2)     
     print("... completed boolean union operation. now there are {} meshes.".format(len(ms)))
     ms.remove_duplicate_vertices()

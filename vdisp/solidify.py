@@ -19,6 +19,7 @@ def solidify_directory(pth_src, xydisp_full, zdisp_inout, reconstruction_depth=8
     elif not isinstance(pth_dst, pathlib.Path): pth_dst = pathlib.Path(pth_dst)
 
     files = sorted([p.resolve() for p in pth_src.glob("*") if p.suffix in [".tif", ".tiff"]])
+    print("Discovered {} TIFF files in {}".format(len(files),pth_src))
     for n,f in enumerate(files):
         #if n%4!=0: continue
         start_time = time.time()

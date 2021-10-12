@@ -6,7 +6,7 @@ import numpy as np
 
 PTH_SRC = pathlib.Path(r'G:\My Drive\Research and Professional Service\21 Venice Biennale\Biennale Production\Latent Printable\210918_facesoverfit-000020-210930-circle-500-4')
 FNAME_CFG = "aggregation_exp.json"
-DIRNAME_OBJ = "solids" # subdirectory of PTH_SRC that contains source files
+DIRNAME_OBJ = "solids_9" # subdirectory of PTH_SRC that contains source files
 DIRNAME_DST = "parts" # subdirectory of PTH_SRC in which to save results. existing files will be overwritten.
 
 DIRNAME_MOD_MSH = "msh" # subdirectory of VDISP module that contains meshes for booleans
@@ -44,10 +44,11 @@ def main():
     if 'engrave_dir' in cfg_agg and cfg_agg['engrave_dir']: dirname_id_msh = cfg_agg['engrave_dir']
     if not dirname_id_msh: print("engraving directory not defined, this part will not be engraved.")    
 
-    names = ["001", "002"]
+    #names = ["003","005","006","104","105","106"]
 
     for n,smpl in enumerate(cfg_agg['samples']):
-        if smpl['name'] not in names: continue
+        #if smpl['name'] not in names:  continue
+
         start_time = time.time()
         print("\n\n------------------------------ {}\t{}\n-----".format(smpl['name'], smpl['pth_file'].name))
         try:
