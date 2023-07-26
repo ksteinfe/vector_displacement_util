@@ -1,6 +1,6 @@
 import vdisp as vd
 
-PTH_SRC = r'C:\tmp\210918_faces'
+PTH_SRC = r'C:\tmp'
 PTH_DST = r'C:\tmp'
 
 XYDISP_FULL = False # if True, xy displacements span the whole uv square (-1 to 1); if False, xy displacements span half the uv square (-0.5 to 0.5)
